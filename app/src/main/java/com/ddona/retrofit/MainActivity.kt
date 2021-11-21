@@ -10,6 +10,11 @@ import com.ddona.retrofit.adapter.CommentAdapter
 import com.ddona.retrofit.databinding.ActivityMainBinding
 import com.ddona.retrofit.model.Comment
 import com.ddona.retrofit.network.CommentClient
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,10 +36,43 @@ class MainActivity : AppCompatActivity() {
         binding.rvComments.adapter = adapter
         binding.rvComments.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        getAllCommentWithCoroutines()
+        getAllCommentsWithRx()
+//        getAllCommentWithCoroutines()
 //        getAllCommentAsync()
 //        getAllCommentSync()
         //..code
+    }
+
+    private fun getAllCommentsWithRx() {
+        CommentClient().getAllCommentsWithRx()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { data ->
+                comments.addAll(data)
+                adapter.notifyDataSetChanged()
+            }
+        //here is result data
+//        CommentClient().getAllCommentsWithRx()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .flatMap { list -> Observable.fromIterable(list) }
+//            .filter { comment -> comment.id % 2 == 0 }
+//            .toList()
+//            .subscribe { data ->
+//                comments.addAll(data)
+//                adapter.notifyDataSetChanged()
+//            }
+
+//        val data = CommentClient().getAllCommentsWithRx()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .flatMap { list -> Observable.fromIterable(list) }
+//            .filter { comment -> comment.id % 2 == 0 }
+//            .toList().subscribe()
+//        comments.addAll(data)
+//        adapter.notifyDataSetChanged()
+
+
     }
 
     private fun getAllCommentWithCoroutines() {
