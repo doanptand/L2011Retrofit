@@ -17,10 +17,11 @@ interface CommentService {
     fun getAllCommentsWithRx(): Observable<List<Comment>>
 
     @GET("comments/{id}")
+    @Headers("Content-Type: application/json", "Content-Length: 15402")
     fun getCommentById(@Path("id") postId: String): Call<Comment>
 
     @POST("posts")
-    fun addComment(@Body comment: Comment)
+    fun addComment(@Header("Content-Type") contentType: String, @Body comment: Comment)
 
     //    https://jsonplaceholder.cypress.io/comment?user_id=5&field=id&sort=desc
     @GET("comments")
