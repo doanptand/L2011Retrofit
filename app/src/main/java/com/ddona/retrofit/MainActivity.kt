@@ -13,6 +13,8 @@ import com.ddona.retrofit.network.CommentClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
@@ -29,13 +31,35 @@ class MainActivity : AppCompatActivity() {
         binding.rvComments.adapter = adapter
         binding.rvComments.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        Log.d("doanpt", "before calll")
-        getAllCommentSync()
-        Log.d("doanpt", "After calll")
+        getAllCommentAsync()
+//        getAllCommentSync()
         //..code
     }
 
+    private fun getAllCommentAsync() {
+        CommentClient().getAllComments().enqueue(object : Callback<List<Comment>> {
+            override fun onResponse(call: Call<List<Comment>>, response: Response<List<Comment>>) {
+                if (response.isSuccessful) {
+                    val data = response.body()
+                    data?.let {
+                        comments.addAll(data)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<Comment>>, t: Throwable) {
+                Log.d("doanpt", "${t.message}")
+                t.printStackTrace()
+            }
+
+        })
+        Log.d("doanpt", "get size:${comments.size}")
+        adapter.notifyDataSetChanged()
+    }
+
     private fun getAllCommentSync() {
+        Log.d("doanpt", "before calll")
         lifecycleScope.launch(Dispatchers.IO) {
             val response: Response<List<Comment>> = CommentClient().getAllComments().execute()
             if (response.isSuccessful) {
@@ -49,5 +73,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        Log.d("doanpt", "After calll")
     }
 }
