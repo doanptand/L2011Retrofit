@@ -31,9 +31,20 @@ class MainActivity : AppCompatActivity() {
         binding.rvComments.adapter = adapter
         binding.rvComments.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        getAllCommentAsync()
+        getAllCommentWithCoroutines()
+//        getAllCommentAsync()
 //        getAllCommentSync()
         //..code
+    }
+
+    private fun getAllCommentWithCoroutines() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val data = CommentClient().getAllCommentsWithCoroutines()
+            comments.addAll(data)
+            withContext(Dispatchers.Main) {
+                adapter.notifyDataSetChanged()
+            }
+        }
     }
 
     private fun getAllCommentAsync() {

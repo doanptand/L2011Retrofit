@@ -10,6 +10,9 @@ interface CommentService {
     @GET("comments/")
     fun getAllComments(): Call<List<Comment>>
 
+    @GET("comments/")
+    suspend fun getAllCommentsWithCoroutines(): List<Comment>
+
     @GET("comments/{id}")
     fun getCommentById(@Path("id") postId:String): Call<Comment>
 }
